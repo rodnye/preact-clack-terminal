@@ -1,0 +1,88 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0a0c10;
+  font-family: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.playground-container {
+  max-width: 900px;
+  width: 100%;
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.playground-header {
+  background: #0d1117;
+  padding: 0.9rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(10px);
+}
+
+.playground-title {
+  color: #e6edf3;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.playground-badge {
+  color: #3fb950;
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.terminal-root {
+  flex: 1;
+  background: #05070a;
+  overflow: hidden;
+}
+
+.playground-footer {
+  background: #0d1117;
+  padding: 0.6rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 0.7rem;
+  color: #7d8590;
+}
+
+.footer-symbol {
+  color: #3fb950;
+  font-size: 0.75rem;
+}
+
+/* subtle custom scrollbar */
+.terminal-root ::-webkit-scrollbar {
+  width: 6px;
+}
+
+.terminal-root ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.terminal-root ::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 3px;
+}
+
+.terminal-root ::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}

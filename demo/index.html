@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preact Clack Terminal — Playground</title>
+    <link href="demo.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="playground-container">
+      <div id="clack-terminal-root" class="terminal-root"></div>
+      <div class="playground-footer">
+        <span class="footer-symbol">◈</span>
+        <span>interactive prompts like a terminal :D</span>
+        <span class="footer-symbol">◈</span>
+      </div>
+    </div>
+    <script>
+      window.process = { env: {} };
+    </script>
+    <script type="module" src="demo.mjs"></script>
+  </body>
+</html>
