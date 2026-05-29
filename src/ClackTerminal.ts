@@ -8,27 +8,50 @@ import {
   createConfirmPrompt,
 } from './promptFactory';
 
+interface InitOptions {
+  header?: boolean;
+}
+
 export class ClackTerminal implements TerminalApi {
   private static instances = new WeakMap<Element, ClackTerminal>();
 
-  private constructor(container: Element) {
-    render(h(TerminalComponent, null), container);
+  private constructor(container: Element, options?: InitOptions) {
+    render(
+      h(TerminalComponent, {
+        header: options?.header ?? true,
+      }),
+      container,
+    );
   }
 
-  static init(selector: string): ClackTerminal {
+  static init(selector: string, options?: InitOptions): ClackTerminal {
     const container = document.querySelector(selector);
-    if (!container) throw new Error(`Element ${selector} not found`);
+
+    if (!container) {
+      throw new Error(`Element ${selector} not found`);
+    }
+
     if (ClackTerminal.instances.has(container)) {
       return ClackTerminal.instances.get(container)!;
     }
-    const instance = new ClackTerminal(container);
+
+    const instance = new ClackTerminal(container, options);
+
     ClackTerminal.instances.set(container, instance);
+
     return instance;
   }
 
   print(text: string): void {
     const current = messagesStore.get();
-    messagesStore.set([...current, { type: 'print', content: text }]);
+
+    messagesStore.set([
+      ...current,
+      {
+        type: 'print',
+        content: text,
+      },
+    ]);
   }
 
   println(text: string): void {
@@ -36,7 +59,10 @@ export class ClackTerminal implements TerminalApi {
   }
 
   async select<T>(
-    options: { label: string; value: T }[],
+    options: {
+      label: string;
+      value: T;
+    }[],
     message: string,
   ): Promise<T> {
     return createSelectPrompt<T>(options, message);
@@ -48,9 +74,14 @@ export class ClackTerminal implements TerminalApi {
   ): Promise<number> {
     return createTextPrompt<number>(message, {
       ...opts,
+
       parser: (val) => {
         const num = Number.parseInt(val, 10);
-        if (isNaN(num)) throw new Error('Must be a valid integer');
+
+        if (Number.isNaN(num)) {
+          throw new Error('Must be a valid integer');
+        }
+
         return num;
       },
     });
@@ -62,9 +93,14 @@ export class ClackTerminal implements TerminalApi {
   ): Promise<number> {
     return createTextPrompt<number>(message, {
       ...opts,
+
       parser: (val) => {
         const num = Number.parseFloat(val);
-        if (isNaN(num)) throw new Error('Must be a valid number');
+
+        if (Number.isNaN(num)) {
+          throw new Error('Must be a valid number');
+        }
+
         return num;
       },
     });
@@ -76,6 +112,7 @@ export class ClackTerminal implements TerminalApi {
   ): Promise<string> {
     return createTextPrompt<string>(message, {
       ...opts,
+
       parser: (val) => val,
     });
   }

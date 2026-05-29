@@ -1,41 +1,82 @@
 import { useEffect, useRef } from 'preact/hooks';
-import type { MessageEntry } from '../types';
+import type { MessageEntry, PromptData } from '../types';
+
+import { SelectPrompt } from './SelectPrompt';
+import { TextPrompt } from './TextPrompt';
+import { ConfirmPrompt } from './ConfirmPrompt';
 
 interface Props {
   messages: MessageEntry[];
+  activePrompt: PromptData | null;
 }
 
-export function MessageList({ messages }: Props) {
+function getPrefix(type: MessageEntry['type']) {
+  switch (type) {
+    case 'result':
+      return '└';
+
+    case 'system':
+    case 'print':
+    default:
+      return '│';
+  }
+}
+
+export function MessageList({ messages, activePrompt }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
-    }
-  }, [messages]);
+    if (!containerRef.current) return;
 
-  const getIcon = (type: MessageEntry['type']) => {
-    if (type === 'print') return '▶';
-    if (type === 'result') return '●';
-    return '◆';
-  };
+    containerRef.current.scrollTop = containerRef.current.scrollHeight;
+  }, [messages, activePrompt]);
 
   return (
-    <div className="clack-messages" ref={containerRef}>
+    <div ref={containerRef} className="clack-stream">
       {messages.length === 0 && (
-        <div className="clack-message clack-system">
-          <span className="clack-message-icon">◉</span>
-          <span className="clack-message-text">
-            Ready — use terminal methods
-          </span>
+        <div className="clack-line clack-system">
+          <span className="clack-prefix">│</span>
+
+          <span className="clack-content">Ready — awaiting command</span>
         </div>
       )}
+
       {messages.map((msg, idx) => (
-        <div key={idx} className={`clack-message clack-${msg.type}`}>
-          <span className="clack-message-icon">{getIcon(msg.type)}</span>
-          <span className="clack-message-text">{msg.content}</span>
+        <div key={idx} className={`clack-line clack-${msg.type}`}>
+          <span className="clack-prefix">{getPrefix(msg.type)}</span>
+
+          <span className="clack-content">{msg.content}</span>
         </div>
       ))}
+
+      {activePrompt?.type === 'select' && (
+        <SelectPrompt
+          message={activePrompt.message}
+          options={activePrompt.options}
+          onSelect={(value) => activePrompt.resolve(value)}
+          onCancel={() => activePrompt.reject(new Error('Prompt cancelled'))}
+        />
+      )}
+
+      {activePrompt?.type === 'text' && (
+        <TextPrompt
+          message={activePrompt.message}
+          options={activePrompt.options}
+          parser={activePrompt.parser}
+          onSubmit={(value) => activePrompt.resolve(value)}
+          onCancel={() => activePrompt.reject(new Error('Prompt cancelled'))}
+        />
+      )}
+
+      {activePrompt?.type === 'confirm' && (
+        <ConfirmPrompt
+          message={activePrompt.message}
+          yesLabel={activePrompt.yesLabel}
+          noLabel={activePrompt.noLabel}
+          onConfirm={(value) => activePrompt.resolve(value)}
+          onCancel={() => activePrompt.reject(new Error('Prompt cancelled'))}
+        />
+      )}
     </div>
   );
 }

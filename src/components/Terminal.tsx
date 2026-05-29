@@ -1,22 +1,32 @@
 import { useStore } from '@nanostores/preact';
 import { messagesStore, promptStore } from '../store';
 import { MessageList } from './MessageList';
-import { PromptArea } from './PromptArea';
 import '../styles/terminal.css';
 
-export function TerminalComponent() {
+interface Props {
+  header?: boolean;
+}
+
+export function TerminalComponent({ header = true }: Props) {
   const messages = useStore(messagesStore);
+
   const activePrompt = useStore(promptStore);
 
   return (
     <div className="clack-terminal">
-      <div className="clack-terminal-header">
-        <span className="clack-symbol">◆</span>
-        <span className="clack-title">preact-clack-terminal</span>
-        <span className="clack-symbol">▲</span>
-      </div>
-      <MessageList messages={messages} />
-      <PromptArea activePrompt={activePrompt} />
+      {header && (
+        <div className="clack-header">
+          <div className="clack-header-left">
+            <span className="clack-dot" />
+            <span className="clack-dot" />
+            <span className="clack-dot" />
+          </div>
+
+          <div className="clack-header-title">preact-clack-terminal</div>
+        </div>
+      )}
+
+      <MessageList messages={messages} activePrompt={activePrompt} />
     </div>
   );
 }
