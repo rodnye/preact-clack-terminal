@@ -1,4 +1,4 @@
-import { promptStore } from './store';
+import { messagesStore, promptStore } from './store';
 import type { SelectOption, TextPromptOptions, ConfirmOptions } from './types';
 
 export function createSelectPrompt<T>(
@@ -11,9 +11,9 @@ export function createSelectPrompt<T>(
       message,
       options: options.map((opt) => ({ label: opt.label, value: opt.value })),
       resolve: (val: T) => {
+        addResultMessage(`${message} → ${String(val)}`);
         promptStore.set(null);
         resolve(val);
-        addResultMessage(`${message} → ${String(val)}`);
       },
       reject: (err: Error) => {
         promptStore.set(null);
@@ -38,9 +38,9 @@ export function createTextPrompt<T>(
       },
       parser: opts.parser,
       resolve: (val: T) => {
+        addResultMessage(`${message} → ${String(val)}`);
         promptStore.set(null);
         resolve(val);
-        addResultMessage(`${message} → ${String(val)}`);
       },
       reject: (err: Error) => {
         promptStore.set(null);
@@ -61,9 +61,9 @@ export function createConfirmPrompt(
       yesLabel: opts?.yesLabel ?? 'Yes',
       noLabel: opts?.noLabel ?? 'No',
       resolve: (val: boolean) => {
+        addResultMessage(`${message} → ${val ? 'Yes' : 'No'}`);
         promptStore.set(null);
         resolve(val);
-        addResultMessage(`${message} → ${val ? 'Yes' : 'No'}`);
       },
       reject: (err: Error) => {
         promptStore.set(null);
@@ -74,8 +74,6 @@ export function createConfirmPrompt(
 }
 
 function addResultMessage(content: string) {
-  import('./store').then(({ messagesStore }) => {
-    const current = messagesStore.get();
-    messagesStore.set([...current, { type: 'result', content }]);
-  });
+  const current = messagesStore.get();
+  messagesStore.set([...current, { type: 'result', content }]);
 }

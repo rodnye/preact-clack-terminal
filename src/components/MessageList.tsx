@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import type { MessageEntry, PromptData } from '../types';
 
 import { SelectPrompt } from './SelectPrompt';
@@ -14,7 +14,6 @@ function getPrefix(type: MessageEntry['type']) {
   switch (type) {
     case 'result':
       return '└';
-
     case 'system':
     case 'print':
     default:
@@ -24,19 +23,26 @@ function getPrefix(type: MessageEntry['type']) {
 
 export function MessageList({ messages, activePrompt }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [prevMessagesLength, setPrevMessagesLength] = useState(messages.length);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    containerRef.current.scrollTop = containerRef.current.scrollHeight;
-  }, [messages, activePrompt]);
+    containerRef.current.scrollTo({
+      top: containerRef.current.scrollHeight,
+      behavior: 'smooth',
+    });
+
+    if (messages.length > prevMessagesLength) {
+      setPrevMessagesLength(messages.length);
+    }
+  }, [messages, activePrompt, prevMessagesLength]);
 
   return (
     <div ref={containerRef} className="clack-stream">
       {messages.length === 0 && (
         <div className="clack-line clack-system">
           <span className="clack-prefix">│</span>
-
           <span className="clack-content">Ready — awaiting command</span>
         </div>
       )}
@@ -44,7 +50,6 @@ export function MessageList({ messages, activePrompt }: Props) {
       {messages.map((msg, idx) => (
         <div key={idx} className={`clack-line clack-${msg.type}`}>
           <span className="clack-prefix">{getPrefix(msg.type)}</span>
-
           <span className="clack-content">{msg.content}</span>
         </div>
       ))}
@@ -53,7 +58,9 @@ export function MessageList({ messages, activePrompt }: Props) {
         <SelectPrompt
           message={activePrompt.message}
           options={activePrompt.options}
-          onSelect={(value) => activePrompt.resolve(value)}
+          onSelect={(value) => {
+            activePrompt.resolve(value);
+          }}
           onCancel={() => activePrompt.reject(new Error('Prompt cancelled'))}
         />
       )}
@@ -63,7 +70,10 @@ export function MessageList({ messages, activePrompt }: Props) {
           message={activePrompt.message}
           options={activePrompt.options}
           parser={activePrompt.parser}
-          onSubmit={(value) => activePrompt.resolve(value)}
+          onSubmit={(value) => {
+            activePrompt.resolve(value);
+            activePrompt.options.initialValue = '';
+          }}
           onCancel={() => activePrompt.reject(new Error('Prompt cancelled'))}
         />
       )}

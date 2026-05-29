@@ -36,6 +36,7 @@ export function TextPrompt<T>({
         }
       }
       onSubmit(parsed);
+      setInput('');
     } catch (err: any) {
       setError(err.message || 'Invalid input');
     }
