@@ -305,3 +305,26 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #2d3744;
 }
+
+.clack-option-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clack-option-hint {
+  margin-left: auto;
+  font-size: 0.8em;
+  color: var(--dim);
+}
+
+.clack-password-prompt .clack-text-input {
+  letter-spacing: 2px;
+}
+
+.clack-spinner .clack-prefix {
+  animation: subtlePulse 1s step-end infinite;
+}
+
+.clack-task .clack-prefix {
+  width: 1.5em;
+}

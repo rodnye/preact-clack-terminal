@@ -1,9 +1,14 @@
 export interface SelectOption<T = any> {
-  label: string;
   value: T;
+  label: string;
+  disabled?: boolean;
+  hint?: string;
 }
 
-export interface TextPromptOptions<T> {
+export interface MultiselectOption<T = any> extends SelectOption<T> {}
+
+export interface TextOptions<T> {
+  message: string;
   placeholder?: string;
   initialValue?: string;
   validate?: (
@@ -13,60 +18,79 @@ export interface TextPromptOptions<T> {
 }
 
 export interface ConfirmOptions {
+  message: string;
   yesLabel?: string;
   noLabel?: string;
 }
 
-export type ValidationResult = string | void | undefined;
-
-export interface MessageEntry {
-  type: 'print' | 'system' | 'result';
-  content: string;
+export interface GroupOptions {
+  onCancel?: (ctx: { results: Record<string, any> }) => void;
 }
+
+export interface SpinnerInstance {
+  start(text: string): this;
+  stop(text?: string): this;
+  message(text: string): this;
+}
+
+export interface Task {
+  title: string;
+  task: (message: (msg: string) => void) => Promise<string | undefined>;
+  status?: 'pending' | 'success' | 'error';
+}
+
+export type MessageEntry = {
+  type: 'print' | 'system' | 'result' | 'spinner' | 'task';
+  content: string;
+  spinnerId?: string;
+};
 
 export type PromptData =
   | {
-      type: 'select';
-      message: string;
-      options: SelectOption[];
-      resolve: (value: any) => void;
-      reject: (err: Error) => void;
-    }
-  | {
       type: 'text';
       message: string;
-      options: TextPromptOptions<any>;
+      options: TextOptions<any>;
       parser: (raw: string) => any;
-      resolve: (value: any) => void;
-      reject: (err: Error) => void;
+      resolve: (v: any) => void;
+      reject: (e: Error) => void;
+    }
+  | {
+      type: 'password';
+      message: string;
+      mask: string;
+      validate?: (v: string) => string | void | Promise<string | void>;
+      resolve: (v: string) => void;
+      reject: (e: Error) => void;
     }
   | {
       type: 'confirm';
       message: string;
       yesLabel: string;
       noLabel: string;
-      resolve: (value: boolean) => void;
-      reject: (err: Error) => void;
+      resolve: (v: boolean) => void;
+      reject: (e: Error) => void;
+    }
+  | {
+      type: 'select';
+      message: string;
+      options: SelectOption[];
+      resolve: (v: any) => void;
+      reject: (e: Error) => void;
+    }
+  | {
+      type: 'multiselect';
+      message: string;
+      options: MultiselectOption[];
+      required: boolean;
+      resolve: (v: any[]) => void;
+      reject: (e: Error) => void;
+    }
+  | {
+      type: 'autocomplete';
+      message: string;
+      options: SelectOption[];
+      placeholder: string;
+      maxItems: number;
+      resolve: (v: any) => void;
+      reject: (e: Error) => void;
     };
-
-export interface TerminalApi {
-  print(text: string): void;
-  println(text: string): void;
-  select<T>(
-    options: { label: string; value: T }[],
-    message: string,
-  ): Promise<T>;
-  int(
-    message: string,
-    opts?: Omit<TextPromptOptions<number>, 'parser'>,
-  ): Promise<number>;
-  float(
-    message: string,
-    opts?: Omit<TextPromptOptions<number>, 'parser'>,
-  ): Promise<number>;
-  read(
-    message: string,
-    opts?: Omit<TextPromptOptions<string>, 'parser'>,
-  ): Promise<string>;
-  confirm(message: string, opts?: ConfirmOptions): Promise<boolean>;
-}

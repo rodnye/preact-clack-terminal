@@ -1,22 +1,21 @@
 import { useState, useRef, useEffect } from 'preact/hooks';
-import { TextOptions } from '../types';
 
-interface Props<T> {
+interface Props {
   message: string;
-  options: TextOptions<T>;
-  parser: (raw: string) => T;
-  onSubmit: (value: T) => void;
+  mask: string;
+  validate?: (v: string) => string | void | Promise<string | void>;
+  onSubmit: (value: string) => void;
   onCancel: () => void;
 }
 
-export function TextPrompt<T>({
+export function PasswordPrompt({
   message,
-  options,
-  parser,
+  validate,
+  mask = '*',
   onSubmit,
   onCancel,
-}: Props<T>) {
-  const [input, setInput] = useState(options.initialValue || '');
+}: Props) {
+  const [input, setInput] = useState('');
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -26,20 +25,14 @@ export function TextPrompt<T>({
 
   const handleSubmit = async () => {
     setError(null);
-    try {
-      const parsed = parser(input);
-      if (options.validate) {
-        const validationError = await options.validate(parsed);
-        if (validationError) {
-          setError(validationError);
-          return;
-        }
+    if (validate) {
+      const err = await validate(input);
+      if (err) {
+        setError(err);
+        return;
       }
-      onSubmit(parsed);
-      setInput('');
-    } catch (err: any) {
-      setError(err.message || 'Invalid input');
     }
+    onSubmit(input);
   };
 
   const handleKey = (e: KeyboardEvent) => {
@@ -48,23 +41,33 @@ export function TextPrompt<T>({
   };
 
   return (
-    <div className="clack-prompt clack-text-prompt">
+    <div className="clack-prompt clack-password-prompt">
       <div className="clack-prompt-message">
         <span className="clack-prompt-symbol">◈</span>
         <span className="clack-prompt-text">{message}</span>
       </div>
       <div className="clack-input-wrapper">
         <span className="clack-input-symbol">❯</span>
-        <input
-          ref={inputRef}
-          type="text"
-          className="clack-text-input"
-          value={input}
-          onInput={(e) => setInput((e.target as HTMLInputElement).value)}
-          onKeyDown={handleKey}
-          placeholder={options.placeholder || ''}
-          autoComplete="off"
-        />
+        <div style={{ position: 'relative', width: '100%' }}>
+          <input
+            ref={inputRef}
+            style={{ position: 'absolute', opacity: '0' }}
+            value={input}
+            onInput={(e) => setInput((e.target as HTMLInputElement).value)}
+            onKeyDown={handleKey}
+            autoComplete="off"
+          />
+          <input
+            type="text"
+            className="clack-text-input"
+            value={mask.repeat(input.length)}
+            onFocus={() => inputRef.current!.focus()}
+            onInput={(e) => setInput((e.target as HTMLInputElement).value)}
+            onKeyDown={handleKey}
+            placeholder={mask.repeat(8)}
+            autoComplete="off"
+          />
+        </div>
       </div>
       {error && (
         <div className="clack-validation-error">
