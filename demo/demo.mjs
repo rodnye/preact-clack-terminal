@@ -1,3 +1,4 @@
+// demo/demo.mjs
 import ClackTerminal from '../src';
 
 if (document.readyState === 'loading') {
@@ -9,18 +10,22 @@ if (document.readyState === 'loading') {
 async function init() {
   const terminal = ClackTerminal.init('#clack-terminal-root');
 
-  await new Promise((r) => setTimeout(r, 50));
+  // ---- Intro ----
+  terminal.intro('Preact Clack Terminal — Full API Demo');
 
-  // header
-  terminal.println('◆━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◆');
-  terminal.print('  Preact Clack Terminal  ');
-  terminal.println('  v1.0  ');
-  terminal.println('◆━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◆');
-  terminal.println('◈ interactive prompt ui ◈');
-  terminal.println('');
+  // ---- Log examples ----
+  terminal.log.info('Starting interactive session...');
+  terminal.log.step('Loading modules');
+  await new Promise((r) => setTimeout(r, 300));
+  terminal.log.success('Ready');
+  terminal.log.message('◆━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◆');
+  terminal.log.message('  Welcome to the terminal playground');
+  terminal.log.message('◆━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◆');
+  terminal.log.message('');
 
-  // ---- identity ----
-  const userName = await terminal.read('What should I call you?', {
+  // ---- 1. Text input (already used, but keep for context) ----
+  const userName = await terminal.text({
+    message: 'What should I call you?',
     placeholder: 'e.g., John el. Tranca',
     validate: (v) => {
       if (!v || v.trim().length < 2)
@@ -29,139 +34,179 @@ async function init() {
       return undefined;
     },
   });
-  terminal.println(`◇ Pleasure to meet you, ${userName}.`);
-  terminal.println('');
+  terminal.log.success(`Pleased to meet you, ${userName}.`);
+  terminal.log.message('');
 
-  // ---- mature age check ----
-  const age = await terminal.int('How many years have you been around?', {
+  // ---- 2. Password input (new) ----
+  const secret = await terminal.password({
+    message: 'Enter a secret password (visible as masked)',
+    mask: '•',
+    validate: (v) => {
+      if (v.length < 4) return 'Password must be at least 4 characters';
+      return undefined;
+    },
+  });
+  terminal.log.success('Password accepted (not stored)');
+  terminal.log.message('');
+
+  // ---- 3. Number validation via text + parser (como int/float ya no existen) ----
+  const ageStr = await terminal.text({
+    message: 'How many years have you been around?',
     placeholder: '29',
     validate: (v) => {
-      if (v < 0) return 'Negative age? Really?';
-      if (v < 12) return "You're a bit young for this terminal, kid.";
-      if (v > 110) return "Okay... I don't think you're human.";
-      if (v < 18) return "Almost there. Come back when you're 18.";
+      const num = parseInt(v, 10);
+      if (isNaN(num)) return 'Please enter a number';
+      if (num < 0) return 'Negative age? Really?';
+      if (num < 12) return "You're a bit young for this terminal, kid.";
+      if (num > 110) return "Okay... I don't think you're human.";
+      if (num < 18) return "Almost there. Come back when you're 18.";
       return undefined;
     },
   });
-
+  const age = parseInt(ageStr, 10);
   if (age >= 18 && age <= 110) {
-    terminal.println(`◆ ${age} years. Respectable.`);
+    terminal.log.message(`${age} years. Respectable.`);
   }
-  terminal.println('');
+  terminal.log.message('');
 
-  // ---- height with dry wit ----
-  const heightCm = await terminal.float('Your height in centimeters?', {
-    placeholder: '175.5',
-    validate: (v) => {
-      if (v < 50) return 'Are we measuring an ant?';
-      if (v > 250) return "That's either a typo or you're a giant.";
-      if (v > 220) return 'You might need to duck through doorways.';
-      return undefined;
-    },
+  // ---- 4. Confirm (already used) ----
+  const likeTerminal = await terminal.confirm({
+    message: 'Enjoying the geometric experience so far?',
+    yesLabel: 'Absolutely',
+    noLabel: 'Not really',
   });
-
-  if (heightCm < 140) {
-    terminal.println('▲ Good things come in small packages.');
-  } else if (heightCm > 200) {
-    terminal.println("▲ Hope you don't hit your head often.");
+  if (likeTerminal) {
+    terminal.log.message('▲ Excellent. The rhombus approves.');
   } else {
-    terminal.println('◇ Average. Solid. Reliable.');
+    terminal.log.message("◀ Honest. I'll take that as constructive feedback.");
   }
-  terminal.println('');
+  terminal.log.message('');
 
-  // ---- philosophical framework pick ----
-  const framework = await terminal.select(
-    [
+  // ---- 5. Select (already used) ----
+  const framework = await terminal.select({
+    message: 'Which frontend framework sparks joy?',
+    options: [
       { label: '⚡ Preact', value: 'preact' },
       { label: '◈ React', value: 'react' },
       { label: '◆ Vue', value: 'vue' },
       { label: '▲ Svelte', value: 'svelte' },
       { label: '⬩ Solid', value: 'solid' },
     ],
-    'Which frontend framework sparks joy?',
-  );
-
-  let frameworkReaction = '';
-  if (framework === 'preact')
-    frameworkReaction = 'Wise choice. Small, fast, honest.';
-  else if (framework === 'react')
-    frameworkReaction = 'Solid. A bit heavy, but we forgive you.';
-  else if (framework === 'vue') frameworkReaction = 'Elegant. You have taste.';
-  else if (framework === 'svelte')
-    frameworkReaction = 'The compiler whisperer. Nice.';
-  else frameworkReaction = 'Bold. I respect that.';
-
-  terminal.println(`▶ ${frameworkReaction}`);
-  terminal.println('');
-
-  // ---- random character assessment ----
-  const vibes = await terminal.select(
-    [
-      { label: '◀ Pragmatic', value: 'pragmatic' },
-      { label: '◆ Idealistic', value: 'idealistic' },
-      { label: '▲ Chaotic', value: 'chaotic' },
-    ],
-    'Describe your coding philosophy:',
-  );
-
-  const vibeMessages = {
-    pragmatic: 'Get things done. I like that.',
-    idealistic: 'Dreamer with a keyboard. The world needs you.',
-    chaotic: "You're either brilliant or insane. Maybe both.",
-  };
-  terminal.println(`◈ ${vibeMessages[vibes]} ◈`);
-  terminal.println('');
-
-  // ---- confirm with personality ----
-  const likeTerminal = await terminal.confirm(
-    'Enjoying the geometric experience?',
-    {
-      yesLabel: '◆ Absolutely ◆',
-      noLabel: '◈ Not really ◈',
-    },
-  );
-
-  if (likeTerminal) {
-    terminal.println('▲ Excellent. The rhombus approves.');
-  } else {
-    terminal.println("◀ Honest. I'll take that as constructive feedback.");
-  }
-  terminal.println('');
-
-  // ---- optional deep dive ----
-  const goDeeper = await terminal.confirm('Run an advanced validation demo?', {
-    yesLabel: '✓ Show me',
-    noLabel: '✗ Skip',
   });
+  terminal.log.message(`▶ You chose ${framework}. Great!`);
+  terminal.log.message('');
 
-  if (goDeeper) {
-    terminal.println("◆ Let's test your patience... ◆");
+  // ---- 6. Multiselect (new) ----
+  const features = await terminal.multiselect({
+    message: 'Select features you love (space to toggle, enter to submit):',
+    options: [
+      { label: 'Terminal UI', value: 'terminal' },
+      { label: 'Reactive prompts', value: 'reactive' },
+      { label: 'Customizable theme', value: 'theme' },
+      { label: 'Debug tools', value: 'debug' },
+      { label: 'Small bundle', value: 'size' },
+    ],
+    required: false,
+  });
+  terminal.log.success(`Selected: ${features.join(', ') || 'none'}`);
+  terminal.log.message('');
 
-    const lucky = await terminal.int('Pick a number between 1 and 1000:', {
-      placeholder: '42',
-      validate: (n) => {
-        if (n < 1) return "Below 1? That's not how numbers work.";
-        if (n > 1000) return "Above 1000? You're testing my limits.";
-        if (n === 666) return 'Ominous choice. But acceptable.';
-        if (n === 7 || n === 42) return 'Classic. Well played.';
-        return undefined;
+  // ---- 7. Autocomplete (new) ----
+  const color = await terminal.autocomplete({
+    message: 'Pick a color (start typing):',
+    options: [
+      { label: 'Red', value: 'red' },
+      { label: 'Green', value: 'green' },
+      { label: 'Blue', value: 'blue' },
+      { label: 'Cyan', value: 'cyan' },
+      { label: 'Magenta', value: 'magenta' },
+      { label: 'Yellow', value: 'yellow' },
+      { label: 'Black', value: 'black' },
+      { label: 'White', value: 'white' },
+    ],
+    placeholder: 'e.g., green',
+    maxItems: 4,
+  });
+  terminal.log.message(`◆ Nice choice: ${color}`);
+  terminal.log.message('');
+
+  // ---- 8. Group prompts (new) ----
+  terminal.log.step(
+    'Now a group of two quick prompts (cancel any to abort group)',
+  );
+  const groupResults = await terminal.group({
+    pet: async () =>
+      terminal.text({ message: 'Favorite pet?', placeholder: 'cat' }),
+    hobby: async () =>
+      terminal.select({
+        message: 'Favorite hobby?',
+        options: [
+          { label: 'Coding', value: 'code' },
+          { label: 'Gaming', value: 'game' },
+          { label: 'Reading', value: 'read' },
+        ],
+      }),
+  });
+  terminal.log.success(
+    `Pet: ${groupResults.pet}, Hobby: ${groupResults.hobby}`,
+  );
+  terminal.log.message('');
+
+  // ---- 9. Spinner (new) ----
+  terminal.log.step('Spinner demo: simulating async work...');
+
+  const spinner = terminal.spinner();
+  spinner.start('Connecting to hyperspace');
+  await new Promise((r) => setTimeout(r, 1500));
+
+  spinner.message('Still working...');
+  await new Promise((r) => setTimeout(r, 1500));
+
+  spinner.stop('Hyperdrive ready');
+  terminal.log.message('');
+
+  // ---- 10. Tasks (sequential, new) ----
+  terminal.log.step('Tasks demo: running sequential tasks');
+  await terminal.tasks([
+    {
+      title: 'Downloading assets',
+      task: async (update) => {
+        update('Fetching from CDN...');
+        await new Promise((r) => setTimeout(r, 1000));
+        update('Validating checksums...');
+        await new Promise((r) => setTimeout(r, 500));
+        return 'Downloaded 5 files';
       },
-    });
+    },
+    {
+      title: 'Compiling styles',
+      task: async (update) => {
+        update('Processing CSS...');
+        await new Promise((r) => setTimeout(r, 800));
+        update('Optimizing...');
+        await new Promise((r) => setTimeout(r, 700));
+        return 'Compiled successfully';
+      },
+    },
+    {
+      title: 'Starting dev server',
+      task: async (update) => {
+        update('Spawning process...');
+        await new Promise((r) => setTimeout(r, 600));
+        return 'Server running on port 3000';
+      },
+    },
+  ]);
+  terminal.log.message('');
 
-    if (lucky === 666) terminal.println('◇ ...courageous.');
-    else if (lucky === 42)
-      terminal.println('◇ The answer to everything. Respect.');
-    else if (lucky === 7) terminal.println("◇ Lucky seven. Can't go wrong.");
-    else terminal.println(`◇ ${lucky} sealed into the logs.`);
-    terminal.println('');
-  } else {
-    terminal.println('◆ Skipping. Efficiency is its own virtue.');
-    terminal.println('');
-  }
+  // ---- 11. Final warnings and outro ----
+  terminal.log.warn('Demo almost finished — all methods tested');
+  terminal.log.error('(This is a fake error, just for demonstration)');
+  terminal.log.message('');
+  terminal.outro('Thanks for exploring the full API! Have fun building.');
 
-  // ---- final wisdom ----
-  terminal.println('◆━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◆');
-  terminal.print('  Terminal ready · ');
-  terminal.print('.read .int .float .select .confirm');
-  terminal.println('◆━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◆');
+  // ---- Optional: example of raw log.message with custom symbol ----
+  terminal.log.message('You can also use custom symbols', {
+    symbol: '★',
+  });
 }
