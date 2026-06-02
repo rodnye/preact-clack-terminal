@@ -89,8 +89,8 @@ async function init() {
       { label: '⚡ Preact', value: 'preact' },
       { label: '◈ React', value: 'react' },
       { label: '◆ Vue', value: 'vue' },
-      { label: '▲ Svelte', value: 'svelte' },
-      { label: '⬩ Solid', value: 'solid' },
+      { label: '⬩ Solid', value: 'solid', disabled: true },
+      { label: '◈ Svelte', value: 'svelte', hint: 'new!' },
     ],
   });
   terminal.log.message(`▶ You chose ${framework}. Great!`);
