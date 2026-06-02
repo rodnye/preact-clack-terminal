@@ -57,6 +57,9 @@ export function SelectPrompt({ message, options, onSelect, onCancel }: Props) {
               {idx === activeIdx ? '▶' : '○'}
             </span>
             <span className="clack-option-label">{opt.label}</span>
+            {opt.hint && idx === activeIdx && (
+              <span className="clack-option-hint">({opt.hint})</span>
+            )}
           </div>
         ))}
       </div>

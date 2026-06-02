@@ -78,7 +78,9 @@ export function MultiselectPrompt({
               {selected.has(opt.value) ? '■' : '□'}
             </span>
             <span className="clack-option-label">{opt.label}</span>
-            {opt.hint && <span className="clack-option-hint">{opt.hint}</span>}
+            {opt.hint && idx === activeIdx  && (
+              <span className="clack-option-hint">{opt.hint}</span>
+            )}
           </div>
         ))}
       </div>

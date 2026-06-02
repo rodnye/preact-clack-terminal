@@ -4,7 +4,7 @@
   --panel-2: #090c10;
   --text: #f0f3f6;
   --muted: #7d8590;
-  --dim: #484f58;
+  --dim: #69707a;
   --accent: #3fb950;
   --danger: #ff7b72;
   --border: #161b22;
@@ -312,8 +312,6 @@
 }
 
 .clack-option-hint {
-  margin-left: auto;
-  font-size: 0.8em;
   color: var(--dim);
 }
 
