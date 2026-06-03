@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'preact/hooks';
-import { TextOptions } from '../types';
+import type { TextOptions } from '../types';
+import { S_PROMPT, S_INPUT } from '../common';
 
 interface Props<T> {
   message: string;
@@ -50,11 +51,11 @@ export function TextPrompt<T>({
   return (
     <div className="clack-prompt clack-text-prompt">
       <div className="clack-prompt-message">
-        <span className="clack-prompt-symbol">◈</span>
+        <span className="clack-prompt-symbol">{S_PROMPT}</span>
         <span className="clack-prompt-text">{message}</span>
       </div>
       <div className="clack-input-wrapper">
-        <span className="clack-input-symbol">❯</span>
+        <span className="clack-input-symbol">{S_INPUT}</span>
         <input
           ref={inputRef}
           type="text"

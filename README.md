@@ -24,7 +24,7 @@ Initialize the terminal:
   const terminal = ClackTerminal.init('#terminal');
 
   terminal.log.message('Welcome!');
-  
+
   (async () => {
     const name = await terminal.text({ message: 'What is your name?' });
     terminal.log.success(`Hello, ${name}!`);
@@ -75,8 +75,8 @@ terminal.log.message('With custom symbol', { symbol: '★' });
 
 ```javascript
 // Simple text input
-const name = await terminal.text({ 
-  message: "What's your name?" 
+const name = await terminal.text({
+  message: "What's your name?",
 });
 
 // With validation & placeholder
@@ -87,7 +87,7 @@ const email = await terminal.text({
     if (!value.includes('@')) return 'Invalid email';
     const exists = await checkEmailExists(value);
     return exists ? 'Email already registered' : undefined;
-  }
+  },
 });
 ```
 
@@ -97,7 +97,7 @@ const email = await terminal.text({
 const password = await terminal.password({
   message: 'Enter your password:',
   mask: '•',
-  validate: (v) => v.length < 4 ? 'Too short' : undefined
+  validate: (v) => (v.length < 4 ? 'Too short' : undefined),
 });
 ```
 
@@ -107,7 +107,7 @@ const password = await terminal.password({
 const confirmed = await terminal.confirm({
   message: 'Continue?',
   yesLabel: '✓ Yes',
-  noLabel: '✗ No'
+  noLabel: '✗ No',
 });
 // Returns true or false
 ```
@@ -122,8 +122,8 @@ const framework = await terminal.select({
     { label: '◆ React', value: 'react' },
     { label: '▲ Vue', value: 'vue' },
     { label: '⬩ Solid', value: 'solid', disabled: true },
-    { label: '◈ Svelte', value: 'svelte', hint: 'new!' }
-  ]
+    { label: '◈ Svelte', value: 'svelte', hint: 'new!' },
+  ],
 });
 // Returns "preact", "react", or "vue"
 ```
@@ -136,9 +136,9 @@ const features = await terminal.multiselect({
   options: [
     { label: 'Terminal UI', value: 'terminal' },
     { label: 'Themes', value: 'themes' },
-    { label: 'Plugins', value: 'plugins' }
+    { label: 'Plugins', value: 'plugins' },
   ],
-  required: false // Set to true to force at least one selection
+  required: false, // Set to true to force at least one selection
 });
 // Returns array of selected values
 ```
@@ -151,10 +151,10 @@ const color = await terminal.autocomplete({
   options: [
     { label: 'Red', value: 'red' },
     { label: 'Green', value: 'green' },
-    { label: 'Blue', value: 'blue' }
+    { label: 'Blue', value: 'blue' },
   ],
   placeholder: 'Type to search...',
-  maxItems: 5
+  maxItems: 5,
 });
 ```
 
@@ -166,13 +166,14 @@ Group multiple prompts together. If any prompt is cancelled, the whole group is 
 const results = await terminal.group({
   name: () => terminal.text({ message: 'Name?' }),
   age: () => terminal.text({ message: 'Age?' }),
-  framework: () => terminal.select({
-    message: 'Framework?',
-    options: [
-      { label: 'Preact', value: 'preact' },
-      { label: 'React', value: 'react' }
-    ]
-  })
+  framework: () =>
+    terminal.select({
+      message: 'Framework?',
+      options: [
+        { label: 'Preact', value: 'preact' },
+        { label: 'React', value: 'react' },
+      ],
+    }),
 });
 // Returns { name, age, framework }
 ```
@@ -217,7 +218,7 @@ await terminal.tasks([
       update('Validating...');
       await delay(500);
       return '✓ Downloaded 5 files';
-    }
+    },
   },
   {
     title: 'Compiling styles',
@@ -225,8 +226,8 @@ await terminal.tasks([
       update('Processing CSS...');
       await delay(800);
       return '✓ Compiled successfully';
-    }
-  }
+    },
+  },
 ]);
 ```
 
@@ -241,7 +242,7 @@ const email = await terminal.text({
     if (!value.includes('@')) return 'Invalid email';
     const exists = await checkEmailExists(value);
     return exists ? 'Email already registered' : undefined;
-  }
+  },
 });
 ```
 
@@ -262,7 +263,7 @@ terminal.intro('Setup Wizard');
 
 const name = await terminal.text({
   message: 'What is your name?',
-  placeholder: 'John Doe'
+  placeholder: 'John Doe',
 });
 
 const age = await terminal.text({
@@ -272,7 +273,7 @@ const age = await terminal.text({
     if (isNaN(num)) return 'Please enter a number';
     if (num < 18) return 'Must be 18+';
     return undefined;
-  }
+  },
 });
 
 const features = await terminal.multiselect({
@@ -280,13 +281,13 @@ const features = await terminal.multiselect({
   options: [
     { label: 'Core', value: 'core' },
     { label: 'Themes', value: 'themes' },
-    { label: 'Plugins', value: 'plugins' }
-  ]
+    { label: 'Plugins', value: 'plugins' },
+  ],
 });
 
 const spinner = terminal.spinner();
 spinner.start('Installing...');
-await new Promise(r => setTimeout(r, 2000));
+await new Promise((r) => setTimeout(r, 2000));
 spinner.stop('Installation complete!');
 
 terminal.outro(`Welcome, ${name}!`);

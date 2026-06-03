@@ -7,7 +7,7 @@ import type {
 } from './types';
 
 function addResultMessage(content: string) {
-  messagesStore.set([...messagesStore.get(), { type: 'result', content }]);
+  messagesStore.set([...messagesStore.get(), { type: 'answer', content }]);
 }
 
 export function createTextPrompt<T>(

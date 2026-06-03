@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'preact/hooks';
 import type { SelectOption } from '../types';
+import { S_SELECT, S_ACTIVE, S_INACTIVE } from '../common';
 
 interface Props {
   message: string;
@@ -41,7 +42,7 @@ export function SelectPrompt({ message, options, onSelect, onCancel }: Props) {
   return (
     <div className="clack-prompt clack-select-prompt" ref={containerRef}>
       <div className="clack-prompt-message">
-        <span className="clack-prompt-symbol">◇</span>
+        <span className="clack-prompt-symbol">{S_SELECT}</span>
         <span className="clack-prompt-text">{message}</span>
       </div>
       <div className="clack-options-list">
@@ -54,7 +55,7 @@ export function SelectPrompt({ message, options, onSelect, onCancel }: Props) {
             onMouseEnter={() => setActiveIdx(idx)}
           >
             <span className="clack-option-marker">
-              {idx === activeIdx ? '▶' : '○'}
+              {idx === activeIdx ? S_ACTIVE : S_INACTIVE}
             </span>
             <span className="clack-option-label">{opt.label}</span>
             {opt.hint && idx === activeIdx && (

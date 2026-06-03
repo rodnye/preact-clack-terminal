@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'preact/hooks';
+import { S_PROMPT, S_INPUT, S_PASSWORD_MASK } from '../common';
 
 interface Props {
   message: string;
-  mask: string;
+  mask?: string;
   validate?: (v: string) => string | void | Promise<string | void>;
   onSubmit: (value: string) => void;
   onCancel: () => void;
@@ -11,7 +12,7 @@ interface Props {
 export function PasswordPrompt({
   message,
   validate,
-  mask = '*',
+  mask = S_PASSWORD_MASK,
   onSubmit,
   onCancel,
 }: Props) {
@@ -43,11 +44,11 @@ export function PasswordPrompt({
   return (
     <div className="clack-prompt clack-password-prompt">
       <div className="clack-prompt-message">
-        <span className="clack-prompt-symbol">◈</span>
+        <span className="clack-prompt-symbol">{S_PROMPT}</span>
         <span className="clack-prompt-text">{message}</span>
       </div>
       <div className="clack-input-wrapper">
-        <span className="clack-input-symbol">❯</span>
+        <span className="clack-input-symbol">{S_INPUT}</span>
         <div style={{ position: 'relative', width: '100%' }}>
           <input
             ref={inputRef}

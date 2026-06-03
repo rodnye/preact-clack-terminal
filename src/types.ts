@@ -40,7 +40,18 @@ export interface Task {
 }
 
 export type MessageEntry = {
-  type: 'print' | 'system' | 'result' | 'spinner' | 'task';
+  type:
+    | 'intro'
+    | 'outro'
+    | 'log'
+    | 'error'
+    | 'warn'
+    | 'success'
+    | 'prompt'
+    | 'answer'
+    | 'spinner'
+    | 'raw'
+    | 'task';
   content: string;
   spinnerId?: string;
 };

@@ -8,6 +8,17 @@ import { MultiselectPrompt } from './MultiselectPrompt';
 import { AutocompletePrompt } from './AutocompletePrompt';
 import { useStore } from '@nanostores/preact';
 import { spinnerStore, tasksStore } from '../store';
+import {
+  S_BAR,
+  S_BAR_END,
+  S_BAR_H,
+  S_BAR_START,
+  S_CONNECT_LEFT,
+  S_ERROR,
+  S_PROMPT,
+  S_SUCCESS,
+  S_WARN,
+} from '../common';
 
 interface Props {
   messages: MessageEntry[];
@@ -16,14 +27,26 @@ interface Props {
 
 function getPrefix(type: MessageEntry['type']) {
   switch (type) {
-    case 'result':
-      return '└';
-    case 'system':
-      return '◆';
+    case 'intro':
+      return S_BAR_START + S_BAR_H.repeat(2);
+    case 'outro':
+      return S_BAR_END;
+    case 'prompt':
+      return S_PROMPT;
+    case 'error':
+      return S_ERROR;
+    case 'warn':
+      return S_WARN;
+    case 'success':
+      return S_SUCCESS;
+    case 'answer':
+      return S_CONNECT_LEFT;
+    case 'raw':
+      return '';
     case 'spinner':
       return '◌';
     default:
-      return '│';
+      return S_BAR;
   }
 }
 
@@ -38,15 +61,23 @@ export function MessageList({ messages, activePrompt }: Props) {
       top: containerRef.current.scrollHeight,
       behavior: 'smooth',
     });
+    console.log(messages);
   }, [messages, activePrompt, spinner, tasks]);
 
   return (
     <div ref={containerRef} className="clack-stream">
       {messages.map((msg, idx) => (
-        <div key={idx} className={`clack-line clack-${msg.type}`}>
-          <span className="clack-prefix">{getPrefix(msg.type)}</span>
-          <span className="clack-content">{msg.content}</span>
-        </div>
+        <>
+          {msg.type !== 'intro' && (
+            <div className={`clack-line clack-${msg.type}`}>
+              <span className="clack-prefix">{S_BAR}</span>
+            </div>
+          )}
+          <div key={idx} className={`clack-line clack-${msg.type}`}>
+            <span className="clack-prefix">{getPrefix(msg.type)}</span>
+            <span className="clack-content">{msg.content}</span>
+          </div>
+        </>
       ))}
       {spinner?.active && (
         <div className="clack-line clack-spinner">

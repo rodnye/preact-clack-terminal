@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'preact/hooks';
 import type { SelectOption } from '../types';
+import { S_PROMPT, S_INPUT, S_ACTIVE, S_INACTIVE } from '../common';
 
 interface Props {
   message: string;
@@ -53,11 +54,11 @@ export function AutocompletePrompt({
   return (
     <div className="clack-prompt clack-autocomplete-prompt">
       <div className="clack-prompt-message">
-        <span className="clack-prompt-symbol">◈</span>
+        <span className="clack-prompt-symbol">{S_PROMPT}</span>
         <span className="clack-prompt-text">{message}</span>
       </div>
       <div className="clack-input-wrapper">
-        <span className="clack-input-symbol">❯</span>
+        <span className="clack-input-symbol">{S_INPUT}</span>
         <input
           ref={inputRef}
           type="text"
@@ -78,7 +79,7 @@ export function AutocompletePrompt({
             onMouseEnter={() => setActiveIdx(idx)}
           >
             <span className="clack-option-marker">
-              {idx === activeIdx ? '▶' : '○'}
+              {idx === activeIdx ? S_ACTIVE : S_INACTIVE}
             </span>
             <span className="clack-option-label">{opt.label}</span>
             {opt.hint && <span className="clack-option-hint">{opt.hint}</span>}

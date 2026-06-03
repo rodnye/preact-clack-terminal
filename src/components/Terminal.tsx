@@ -6,10 +6,10 @@ import '../styles/animations.css';
 import '../styles/terminal.css';
 
 interface Props {
-  header?: boolean;
+  header?: string | boolean;
 }
 
-export function TerminalComponent({ header = true }: Props) {
+export function TerminalComponent({ header }: Props) {
   const messages = useStore(messagesStore);
   const activePrompt = useStore(promptStore);
   const [isVisible, setIsVisible] = useState(false);
@@ -35,7 +35,9 @@ export function TerminalComponent({ header = true }: Props) {
             <span className="clack-dot" />
             <span className="clack-dot" />
           </div>
-          <div className="clack-header-title">preact-clack-terminal</div>
+          <div className="clack-header-title">
+            {typeof header === 'string' ? header : 'preact-clack-terminal'}
+          </div>
         </div>
       )}
       <MessageList messages={messages} activePrompt={activePrompt} />

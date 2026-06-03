@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'preact/hooks';
+import { S_PROMPT, S_ACTIVE, S_INACTIVE } from '../common';
 
 interface Props {
   message: string;
@@ -43,7 +44,7 @@ export function ConfirmPrompt({
   return (
     <div className="clack-prompt clack-confirm-prompt">
       <div className="clack-prompt-message">
-        <span className="clack-prompt-symbol">◈</span>
+        <span className="clack-prompt-symbol">{S_PROMPT}</span>
         <span className="clack-prompt-text">{message}</span>
       </div>
       <div className="clack-confirm-options">
@@ -55,7 +56,7 @@ export function ConfirmPrompt({
             onMouseEnter={() => setActiveIdx(idx)}
           >
             <span className="clack-confirm-marker">
-              {idx === activeIdx ? '▶' : '●'}
+              {idx === activeIdx ? S_ACTIVE : S_INACTIVE}
             </span>
             {opt.label}
           </button>

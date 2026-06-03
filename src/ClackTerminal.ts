@@ -3,6 +3,7 @@ import { TerminalComponent } from './components/Terminal';
 import type {
   ConfirmOptions,
   GroupOptions,
+  MessageEntry,
   MultiselectOption,
   SelectOption,
   SpinnerInstance,
@@ -19,6 +20,16 @@ import {
   createAutocompletePrompt,
   createGroupPrompts,
 } from './promptFactory';
+import {
+  S_SUCCESS,
+  S_INFO,
+  S_WARN,
+  S_ERROR,
+  S_STEP_ACTIVE,
+  S_STEP_SUBMIT,
+  S_BAR_START,
+  S_BAR_END,
+} from './common';
 
 interface InitOptions {
   header?: boolean;
@@ -53,31 +64,38 @@ export class ClackTerminal {
   }
 
   // Core output methods
-  private addMessage(
-    content: string,
-    type: 'print' | 'system' | 'result' = 'print',
-  ) {
+  private addMessage(content: string, type: MessageEntry['type'] = 'log') {
     messagesStore.set([...messagesStore.get(), { type, content }]);
   }
 
   intro(text: string) {
-    this.addMessage(`◆ ${text}`, 'system');
+    this.addMessage(`${text}`, 'intro');
   }
 
   outro(text: string) {
-    this.addMessage(`◇ ${text}`, 'system');
+    this.addMessage(`${text}`, 'outro');
   }
 
   // Log utilities
-  log = {
-    info: (msg: string) => this.addMessage(`● ${msg}`, 'system'),
-    success: (msg: string) => this.addMessage(`✔ ${msg}`, 'system'),
-    step: (msg: string) => this.addMessage(`◈ ${msg}`, 'system'),
-    warn: (msg: string) => this.addMessage(`⚠ ${msg}`, 'system'),
-    error: (msg: string) => this.addMessage(`✖ ${msg}`, 'system'),
-    message: (msg: string, opts?: { symbol?: string }) =>
-      this.addMessage(`${opts?.symbol ?? '◆'} ${msg}`, 'system'),
-  };
+  log = (() => {
+    const returns = (msg: string, opts: { symbol?: string } = {}) =>
+      this.addMessage(
+        `${opts.symbol ? opts.symbol + ' ' : ''}${msg}`,
+        opts.symbol ? 'raw' : 'log',
+      );
+
+    const props = {
+      info: (msg: string) => this.addMessage(msg, 'log'),
+      success: (msg: string) => this.addMessage(msg, 'success'),
+      step: (msg: string) => this.addMessage(msg, 'log'),
+      warn: (msg: string) => this.addMessage(msg, 'warn'),
+      error: (msg: string) => this.addMessage(msg, 'error'),
+      message: returns,
+    };
+    Object.assign(returns, props);
+
+    return returns as typeof returns & typeof props;
+  })();
 
   // Prompt components
   async text(options: TextOptions<string>): Promise<string> {

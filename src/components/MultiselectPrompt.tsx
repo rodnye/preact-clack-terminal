@@ -1,5 +1,11 @@
 import { useState, useEffect, useRef } from 'preact/hooks';
 import type { MultiselectOption } from '../types';
+import {
+  S_SELECT,
+  S_CHECKBOX_ACTIVE,
+  S_CHECKBOX_SELECTED,
+  S_CHECKBOX_INACTIVE,
+} from '../common';
 
 interface Props {
   message: string;
@@ -19,6 +25,12 @@ export function MultiselectPrompt({
   const [selected, setSelected] = useState<Set<any>>(new Set());
   const [activeIdx, setActiveIdx] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const getCheckboxSymbol = (isSelected: boolean, isActive: boolean) => {
+    if (isSelected) return S_CHECKBOX_SELECTED;
+    if (isActive) return S_CHECKBOX_ACTIVE;
+    return S_CHECKBOX_INACTIVE;
+  };
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -54,7 +66,7 @@ export function MultiselectPrompt({
   return (
     <div className="clack-prompt clack-multiselect-prompt" ref={containerRef}>
       <div className="clack-prompt-message">
-        <span className="clack-prompt-symbol">◇</span>
+        <span className="clack-prompt-symbol">{S_SELECT}</span>
         <span className="clack-prompt-text">{message}</span>
       </div>
       <div className="clack-options-list">
@@ -75,10 +87,10 @@ export function MultiselectPrompt({
             onMouseEnter={() => setActiveIdx(idx)}
           >
             <span className="clack-option-marker">
-              {selected.has(opt.value) ? '■' : '□'}
+              {getCheckboxSymbol(selected.has(opt.value), idx === activeIdx)}
             </span>
             <span className="clack-option-label">{opt.label}</span>
-            {opt.hint && idx === activeIdx  && (
+            {opt.hint && idx === activeIdx && (
               <span className="clack-option-hint">{opt.hint}</span>
             )}
           </div>
