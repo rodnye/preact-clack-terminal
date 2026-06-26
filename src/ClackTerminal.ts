@@ -97,6 +97,12 @@ export class ClackTerminal {
     return returns as typeof returns & typeof props;
   })();
 
+  clear() {
+    messagesStore.set([]);
+    spinnerStore.set(null);
+    tasksStore.set([]);
+  }
+
   // Prompt components
   async text(options: TextOptions<string>): Promise<string> {
     return createTextPrompt<string>(options, { parser: (v) => v });
@@ -207,3 +213,4 @@ export class ClackTerminal {
     tasksStore.set([]);
   }
 }
+
